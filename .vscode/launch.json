@@ -23,7 +23,6 @@
             "request": "launch",
             "mainClass": "ClientConsole",
             "projectName": "simpleChat",
-            "args": "localhost"
         },
         {
             "type": "java",
