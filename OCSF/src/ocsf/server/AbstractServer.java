@@ -122,7 +122,7 @@ public abstract class AbstractServer implements Runnable
       if (serverSocket == null)
       {
         serverSocket = new ServerSocket(getPort(), backlog);
-      }
+        }
 
       serverSocket.setSoTimeout(timeout);
       readyToStop = false;

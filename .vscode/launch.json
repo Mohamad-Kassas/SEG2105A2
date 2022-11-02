@@ -23,13 +23,15 @@
             "request": "launch",
             "mainClass": "ClientConsole",
             "projectName": "simpleChat",
+            "args": "client1"
         },
         {
             "type": "java",
             "name": "Launch EchoServer",
             "request": "launch",
             "mainClass": "EchoServer",
-            "projectName": "simpleChat"
+            "projectName": "simpleChat",
+            "args": ""
         }
     ]
 }

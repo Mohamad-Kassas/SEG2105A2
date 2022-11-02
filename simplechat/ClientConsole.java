@@ -51,18 +51,13 @@ public class ClientConsole implements ChatIF
    * @param port The port to connect on.
    * @throws IOException
    */
-  public ClientConsole(String host, int port)
+  public ClientConsole(String host, int port, String loginID)
   {
     try 
     {
-      client= new ChatClient(host, port, this);
+      client = new ChatClient(host, port, loginID, this);
     } 
-    catch(IOException exception) 
-    {
-      System.out.println("Error: Can't setup connection!"
-                + " Terminating client.");
-      System.exit(1);
-    }
+    catch(IOException exception){}
     
     // Create scanner object to read from console
     fromConsole = new Scanner(System.in); 
@@ -99,10 +94,12 @@ public class ClientConsole implements ChatIF
         ("Unexpected error while reading from console!");
     }
   }
+
+  
   /**
    * This method overrides the method in the ChatIF interface.  It
    * displays a message onto the screen.
-   *
+   * 
    * @param message The string to be displayed.
    */
   public void display(String message) 
@@ -120,13 +117,21 @@ public class ClientConsole implements ChatIF
    */
   public static void main(String[] args) 
   {
+    String loginID = "";
     String host = "";
     int port = DEFAULT_PORT;
 
+    try{
+      loginID = args[0];
+    }
+    catch(IndexOutOfBoundsException e){
+      System.out.println("ERROR - No login ID specified.  Connection aborted");
+      return;
+    }
 
     try
     {
-      host = args[0];
+      host = args[1];
     }
     catch(ArrayIndexOutOfBoundsException e)
     {
@@ -134,12 +139,12 @@ public class ClientConsole implements ChatIF
     }
 
     try{
-      port = Integer.parseInt(args[1]);
+      port = Integer.parseInt(args[2]);
     }
     catch(ArrayIndexOutOfBoundsException e){
       port = DEFAULT_PORT;
     }
-    ClientConsole chat= new ClientConsole(host, port);
+    ClientConsole chat= new ClientConsole(host, port, loginID);
     chat.accept();  //Wait for console data
   }
 }

@@ -60,8 +60,31 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
-    serverUI.display("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+
+    String message = String.valueOf(msg);
+
+    Object clientID = client.getInfo("clientIDForServer");
+    serverUI.display("Message received: " + msg + " from " + clientID);
+
+    if (message.startsWith("#login")){
+      Object currentLoginID = client.getInfo("ID");
+      if (currentLoginID != null){
+        try{
+          client.sendToClient("Error, ID already defined. Terminating connection");
+          client.close();
+        }
+        catch (IOException e){}
+      }
+      String[] loginIDList = message.trim().split(" ");
+      String loginID = loginIDList[1];
+      client.setInfo("clientIDForServer", loginID);
+      serverUI.display(loginID + " has logged on");
+      this.sendToAllClients(loginID + " has logged on");
+    }
+    
+    else{
+      this.sendToAllClients(clientID + ": " + msg);
+    }
   }
     
   /**
@@ -93,13 +116,14 @@ public class EchoServer extends AbstractServer
   // Overridden Hook Methods ****************************************
   @Override
   protected void clientConnected(ConnectionToClient client){
-    serverUI.display("New client connected to the server");
+    serverUI.display("A new client is attempting to connect to the server");
   }
 
   @Override
   synchronized protected void clientDisconnected(
     ConnectionToClient client) {
-      serverUI.display("Connection with client " + client.getName() + " terminated");
+      serverUI.display(client.getInfo("clientIDForServer").toString() + " has disconnected");
+    sendToAllClients(client.getInfo("clientIDForServer").toString() + " has disconnected");
         }
 
   @Override
@@ -171,7 +195,6 @@ public class EchoServer extends AbstractServer
   private void executeCloseCommand(){
     try{
       close();
-      serverUI.display("Server disconnected all clients");
     }
     catch (IOException e){}
   }

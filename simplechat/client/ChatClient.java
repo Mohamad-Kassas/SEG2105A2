@@ -27,6 +27,9 @@ public class ChatClient extends AbstractClient
    */
   ChatIF clientUI; 
 
+
+  String loginID;
+
   
   //Constructors ****************************************************
   
@@ -38,12 +41,19 @@ public class ChatClient extends AbstractClient
    * @param clientUI The interface type variable.
    */
   
-  public ChatClient(String host, int port, ChatIF clientUI) 
+  public ChatClient(String host, int port, String loginID, ChatIF clientUI) 
     throws IOException 
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
-    openConnection();
+    this.loginID = loginID;
+    try{
+      openConnection();
+      sendToServer("#login " + loginID);
+    }
+    catch(IOException e){
+      System.out.println("Cannot open connection. Awaiting command");
+    }
   }
 
   
@@ -93,14 +103,14 @@ public class ChatClient extends AbstractClient
 
   @Override
   public void connectionClosed(){
-    clientUI.display("Connection Terminated");
+    clientUI.display("Connection Closed");
   }
 
   @Override
   public void connectionException(Exception exception){
-    clientUI.display("Server disconnected");
-    quit();
-    connectionClosed();
+    clientUI.display("WARNING - The server has stopped listening for connections");
+    clientUI.display("SERVER SHUTTING DOWN! DISCONNECTING!");
+    clientUI.display("Abnormal termination of connection");
   }
 
     /**
@@ -129,7 +139,7 @@ public class ChatClient extends AbstractClient
     }
 
     else if (command.equals("#login")){
-      executeLogInCommand();
+      executeLogInCommand(listCommand);
     }
 
     else if (command.equals("#gethost")){
@@ -221,16 +231,29 @@ public class ChatClient extends AbstractClient
   }
 
 
-  private void executeLogInCommand(){
+  private void executeLogInCommand(String[] listCommand){
+    String argument = "";
+
     if (isConnected()){
       clientUI.display("Client already connected to server");
       return;
     }
+
     try{
+      argument = listCommand[1];
       openConnection();
+      sendToServer("#login " + argument);
       clientUI.display("Connected to server");
     }
-    catch (IOException e){}
+
+    catch(IndexOutOfBoundsException e){
+      clientUI.display("Invalid Command Argument");
+      return;
+    }
+    
+    catch (IOException e){
+      clientUI.display("Unable to connect to server");
+    }
   }
 
 
