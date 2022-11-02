@@ -1,4 +1,4 @@
-##Assignment 2, SEG 2105
+###Assignment 2, SEG 2105
 This is the repository containing the OCSF framework and simple chat application modified according to the assignment instrutcions
 
 Important Note:  
